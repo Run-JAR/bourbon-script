@@ -1,4 +1,4 @@
-# 🍪 BourbonScript
+#  BourbonScript
 
 > *"Snap it, dunk it, run it."*
 
