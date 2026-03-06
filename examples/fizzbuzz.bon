@@ -1,0 +1,17 @@
+// fizzbuzz.bon – The classic
+
+recipe fizzbuzz(n):
+    if n % 15 == 0:
+        display("FizzBuzz")
+    otherwise if n % 3 == 0:
+        display("Fizz")
+    otherwise if n % 5 == 0:
+        display("Buzz")
+    otherwise:
+        display(n)
+
+recipe main():
+    crumble i = 1
+    while i <= 20:
+        fizzbuzz(i)
+        i = i + 1

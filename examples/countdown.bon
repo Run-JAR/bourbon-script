@@ -1,0 +1,9 @@
+// countdown.bon – Countdown to biscuit time
+
+recipe main():
+    display("Countdown to biscuit time!")
+    crumble i = 10
+    while i > 0:
+        display(i)
+        i = i - 1
+    display("Time for a bourbon!")

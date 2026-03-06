@@ -1,0 +1,24 @@
+// gcd.bon – Greatest common divisor and lowest common multiple
+
+recipe gcd(a, b):
+    while b != 0:
+        crumble temp = b
+        b = a % b
+        a = temp
+    plate a
+
+recipe lcm(a, b):
+    plate a / gcd(a, b) * b
+
+recipe main():
+    display("GCD(48, 18) =")
+    display(gcd(48, 18))
+
+    display("GCD(100, 75) =")
+    display(gcd(100, 75))
+
+    display("LCM(4, 6) =")
+    display(lcm(4, 6))
+
+    display("LCM(12, 15) =")
+    display(lcm(12, 15))

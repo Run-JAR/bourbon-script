@@ -1,0 +1,28 @@
+// test_functions.bon
+
+recipe add(a, b):
+    plate a + b
+
+recipe max(a, b):
+    if a > b:
+        plate a
+    otherwise:
+        plate b
+
+recipe factorial(n):
+    if n <= 1:
+        plate 1
+    plate n * factorial(n - 1)
+
+recipe is_even(n):
+    if n % 2 == 0:
+        plate 1
+    otherwise:
+        plate 0
+
+recipe main():
+    display(add(3, 4))
+    display(max(10, 7))
+    display(factorial(6))
+    display(is_even(8))
+    display(is_even(7))

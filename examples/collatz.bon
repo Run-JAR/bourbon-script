@@ -1,0 +1,20 @@
+// collatz.bon – The Collatz conjecture
+// Pick any number. If even, halve it. If odd, multiply by 3 and add 1.
+// It always reaches 1. (We think.)
+
+recipe collatz_steps(n):
+    crumble steps = 0
+    while n != 1:
+        if n % 2 == 0:
+            n = n / 2
+        otherwise:
+            n = n * 3 + 1
+        steps = steps + 1
+    plate steps
+
+recipe main():
+    display("Collatz steps to reach 1:")
+    crumble i = 1
+    while i <= 15:
+        display(collatz_steps(i))
+        i = i + 1

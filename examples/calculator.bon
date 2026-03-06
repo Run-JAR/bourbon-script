@@ -1,0 +1,53 @@
+// calculator.bon – A functional calculator demo
+
+recipe add(a, b):
+    plate a + b
+
+recipe subtract(a, b):
+    plate a - b
+
+recipe multiply(a, b):
+    plate a * b
+
+recipe divide(a, b):
+    plate a / b
+
+recipe abs(n):
+    if n < 0:
+        plate n * -1
+    plate n
+
+recipe min(a, b):
+    if a < b:
+        plate a
+    plate b
+
+recipe max(a, b):
+    if a > b:
+        plate a
+    plate b
+
+recipe clamp(val, lo, hi):
+    plate max(lo, min(val, hi))
+
+recipe main():
+    display("Basic operations:")
+    display(add(12, 8))
+    display(subtract(100, 37))
+    display(multiply(6, 7))
+    display(divide(144, 12))
+
+    display("abs(-42) =")
+    display(abs(-42))
+
+    display("min(3, 9) =")
+    display(min(3, 9))
+
+    display("max(3, 9) =")
+    display(max(3, 9))
+
+    display("clamp(15, 0, 10) =")
+    display(clamp(15, 0, 10))
+
+    display("clamp(-5, 0, 10) =")
+    display(clamp(-5, 0, 10))
