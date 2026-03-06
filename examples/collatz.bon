@@ -1,0 +1,16 @@
+// collatz.bon
+
+recipe collatz_steps(n: int) -> int:
+    crumble steps: int = 0
+    while n != 1:
+        if n % 2 == 0:
+            n = n / 2
+        otherwise:
+            n = n * 3 + 1
+        steps = steps + 1
+    plate steps
+
+recipe main() -> void:
+    display("Collatz steps to reach 1:")
+    bake i from 1 to 16:
+        display(collatz_steps(i))

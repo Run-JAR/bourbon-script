@@ -1,0 +1,15 @@
+// fizzbuzz.bon
+
+recipe fizzbuzz(n: int) -> void:
+    if n % 15 == 0:
+        display("FizzBuzz")
+    otherwise if n % 3 == 0:
+        display("Fizz")
+    otherwise if n % 5 == 0:
+        display("Buzz")
+    otherwise:
+        display(n)
+
+recipe main() -> void:
+    bake i from 1 to 21:
+        fizzbuzz(i)

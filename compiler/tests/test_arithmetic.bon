@@ -1,0 +1,11 @@
+// test_arithmetic.bon
+
+recipe main() -> void:
+    crumble x: int = 5
+    crumble y: int = 10
+    display(x + y)
+    display(x * y)
+    display(y - x)
+    display(y / x)
+    display(y % 3)
+    display((x + y) * 2)

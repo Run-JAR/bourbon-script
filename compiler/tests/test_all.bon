@@ -1,0 +1,171 @@
+// test_all.bon – Tests every BourbonScript feature
+
+// ── Recipes (functions) with typed params and return types ────────────────
+
+recipe add(a: int, b: int) -> int:
+    plate a + b
+
+recipe multiply(a: int, b: int) -> int:
+    plate a * b
+
+recipe is_positive(n: int) -> bool:
+    if n > 0:
+        plate fresh
+    otherwise:
+        plate stale
+
+recipe greet(name: str) -> str:
+    plate "Hello, " + name + "!"
+
+recipe factorial(n: int) -> int:
+    if n <= 1:
+        plate 1
+    otherwise:
+        plate n * factorial(n - 1)
+
+recipe abs(n: int) -> int:
+    if n < 0:
+        plate n * -1
+    otherwise:
+        plate n
+
+recipe max(a: int, b: int) -> int:
+    if a > b:
+        plate a
+    otherwise:
+        plate b
+
+recipe min(a: int, b: int) -> int:
+    if a < b:
+        plate a
+    otherwise:
+        plate b
+
+recipe clamp(val: int, lo: int, hi: int) -> int:
+    plate max(lo, min(val, hi))
+
+recipe main() -> void:
+
+    // ── Variables with types ──────────────────────────────────────────────
+    display("=== Variables ===")
+    crumble x: int = 42
+    crumble name: str = "Bourbon"
+    crumble flag: bool = fresh
+    display(x)
+    display(name)
+    display(flag)
+
+    // ── Arithmetic ────────────────────────────────────────────────────────
+    display("=== Arithmetic ===")
+    display(10 + 3)
+    display(10 - 3)
+    display(10 * 3)
+    display(10 / 2)
+    display(10 % 3)
+    display((2 + 3) * 4)
+
+    // ── Comparison operators ──────────────────────────────────────────────
+    display("=== Comparisons ===")
+    display(5 == 5)
+    display(5 != 4)
+    display(3 < 10)
+    display(10 <= 10)
+    display(9 > 3)
+    display(7 >= 7)
+
+    // ── Logic operators ───────────────────────────────────────────────────
+    display("=== Logic ===")
+    display(fresh && fresh)
+    display(fresh && stale)
+    display(stale || fresh)
+    display(stale || stale)
+    display(!fresh)
+    display(!stale)
+
+    // ── Booleans ──────────────────────────────────────────────────────────
+    display("=== Booleans ===")
+    crumble t: bool = fresh
+    crumble f: bool = stale
+    display(t)
+    display(f)
+
+    // ── String concatenation ──────────────────────────────────────────────
+    display("=== Strings ===")
+    crumble biscuit: str = "Bourbon" + " " + "Biscuit"
+    display(biscuit)
+    display("Length test: " + "hello")
+
+    // ── If / otherwise if / otherwise ────────────────────────────────────
+    display("=== If / Otherwise ===")
+    crumble score: int = 75
+    if score >= 90:
+        display("Excellent")
+    otherwise if score >= 70:
+        display("Good")
+    otherwise if score >= 50:
+        display("OK")
+    otherwise:
+        display("Try again")
+
+    // ── Unary minus ───────────────────────────────────────────────────────
+    display("=== Unary ===")
+    crumble neg: int = -10
+    display(neg)
+    display(-neg)
+
+    // ── Variable reassignment ─────────────────────────────────────────────
+    display("=== Reassignment ===")
+    crumble counter: int = 0
+    counter = counter + 1
+    counter = counter + 1
+    counter = counter + 1
+    display(counter)
+
+    // ── Bake loop (range) ─────────────────────────────────────────────────
+    display("=== Bake Loop ===")
+    bake i from 0 to 5:
+        display(i)
+
+    // ── While loop (condition) ────────────────────────────────────────────
+    display("=== While Loop ===")
+    crumble n: int = 1
+    while n < 32:
+        display(n)
+        n = n * 2
+
+    // ── Nested loops ──────────────────────────────────────────────────────
+    display("=== Nested Loops ===")
+    bake i from 1 to 4:
+        bake j from 1 to 4:
+            display(i * j)
+
+    // ── Function calls ────────────────────────────────────────────────────
+    display("=== Function Calls ===")
+    display(add(3, 4))
+    display(multiply(6, 7))
+    display(greet("Biscuit"))
+    display(factorial(6))
+    display(abs(-99))
+    display(max(4, 9))
+    display(min(4, 9))
+    display(clamp(15, 0, 10))
+    display(clamp(-5, 0, 10))
+    display(clamp(5, 0, 10))
+
+    // ── Boolean-returning recipes ─────────────────────────────────────────
+    display("=== Bool Recipes ===")
+    display(is_positive(5))
+    display(is_positive(-3))
+    display(is_positive(0))
+
+    // ── Recursion ─────────────────────────────────────────────────────────
+    display("=== Recursion ===")
+    bake i from 0 to 8:
+        display(factorial(i))
+
+    // ── User input (order) ────────────────────────────────────────────────
+    display("=== User Input ===")
+    crumble answer: str = order("Type something: ")
+    display("You typed: " + answer)
+
+    display("=== All tests complete! ===")
