@@ -1,0 +1,4 @@
+// test_hello.bon
+
+recipe main() -> void:
+    display("Hello, World!")
