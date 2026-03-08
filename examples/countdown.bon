@@ -1,8 +1,8 @@
-// countdown.bon – Countdown to biscuit time
+// countdown.bon
 
-recipe main():
+recipe main() -> void:
     display("Countdown to biscuit time!")
-    crumble i = 10
+    crumble i: int = 10
     while i > 0:
         display(i)
         i = i - 1

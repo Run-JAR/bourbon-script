@@ -1,8 +1,6 @@
 // test_loop.bon
 
-recipe main():
-    crumble i = 0
-    while i < 5:
+recipe main() -> void:
+    bake i from 0 to 5:
         display(i)
-        i = i + 1
     display(99)

@@ -1,6 +1,6 @@
-// fizzbuzz.bon – The classic
+// fizzbuzz.bon
 
-recipe fizzbuzz(n):
+recipe fizzbuzz(n: int) -> void:
     if n % 15 == 0:
         display("FizzBuzz")
     otherwise if n % 3 == 0:
@@ -10,8 +10,6 @@ recipe fizzbuzz(n):
     otherwise:
         display(n)
 
-recipe main():
-    crumble i = 1
-    while i <= 20:
+recipe main() -> void:
+    bake i from 1 to 21:
         fizzbuzz(i)
-        i = i + 1

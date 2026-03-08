@@ -1,7 +1,5 @@
 # lexer.py – Tokenizer for BourbonScript
-# Indentation-based block structure (like Python)
 
-# Token types
 TT_NUMBER     = 'NUMBER'
 TT_STRING     = 'STRING'
 TT_IDENTIFIER = 'IDENTIFIER'
@@ -21,18 +19,21 @@ TT_AND        = 'AND'
 TT_OR         = 'OR'
 TT_NOT        = 'NOT'
 TT_ASSIGN     = 'ASSIGN'
+TT_ARROW      = 'ARROW'   # ->
 TT_LPAREN     = 'LPAREN'
 TT_RPAREN     = 'RPAREN'
 TT_COMMA      = 'COMMA'
+TT_COLON      = 'COLON'
 TT_NEWLINE    = 'NEWLINE'
 TT_INDENT     = 'INDENT'
 TT_DEDENT     = 'DEDENT'
-TT_COLON      = 'COLON'
 TT_EOF        = 'EOF'
 
 KEYWORDS = {
     'crumble', 'recipe', 'if', 'otherwise', 'while', 'plate',
-    'true', 'false', 'display', 'order'
+    'fresh', 'stale', 'display', 'order',
+    'bake', 'from', 'to',
+    'int', 'str', 'bool', 'void',
 }
 
 class Token:
@@ -40,7 +41,6 @@ class Token:
         self.type = type_
         self.value = value
         self.line = line
-
     def __repr__(self):
         if self.value is not None:
             return f"Token({self.type}, {self.value!r})"
@@ -119,20 +119,16 @@ class Lexer:
 
             if at_line_start:
                 at_line_start = False
-
-                # Measure indentation
                 level = 0
                 while self.current() in (' ', '\t'):
                     level += 4 if self.current() == '\t' else 1
                     self.advance()
 
-                # Skip blank lines
                 if self.current() == '\n':
                     self.advance()
                     at_line_start = True
                     continue
 
-                # Skip comment-only lines
                 if self.current() == '/' and self.peek() == '/':
                     self.skip_comment()
                     if self.current() == '\n':
@@ -143,7 +139,6 @@ class Lexer:
                 if self.current() is None:
                     break
 
-                # Emit INDENT / DEDENTs
                 current_level = self.indent_stack[-1]
                 if level > current_level:
                     self.indent_stack.append(level)
@@ -191,7 +186,15 @@ class Lexer:
                     self.tokens.append(Token(TT_IDENTIFIER, ident, line))
                 continue
 
+            # Three-char: check nothing needed
+
+            # Two-char operators
             two = ch + (self.peek() or '')
+            if two == '->':
+                self.advance(); self.advance()
+                self.tokens.append(Token(TT_ARROW, '->', line))
+                continue
+
             two_map = {
                 '==': TT_EQ, '!=': TT_NEQ, '<=': TT_LTE,
                 '>=': TT_GTE, '&&': TT_AND, '||': TT_OR,

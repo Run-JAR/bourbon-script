@@ -1,57 +1,50 @@
-// sorting.bon – Bubble sort (5 hardcoded values)
+// sorting.bon – Bubble sort on 5 values
 
-recipe main():
-    crumble a = 42
-    crumble b = 17
-    crumble c = 83
-    crumble d = 5
-    crumble e = 61
+recipe main() -> void:
+    crumble a: int = 42
+    crumble b: int = 17
+    crumble c: int = 83
+    crumble d: int = 5
+    crumble e: int = 61
 
-    // Pass 1
     if a > b:
-        crumble t = a
+        crumble t: int = a
         a = b
         b = t
     if b > c:
-        crumble t = b
+        crumble t: int = b
         b = c
         c = t
     if c > d:
-        crumble t = c
+        crumble t: int = c
         c = d
         d = t
     if d > e:
-        crumble t = d
+        crumble t: int = d
         d = e
         e = t
-
-    // Pass 2
     if a > b:
-        crumble t = a
+        crumble t: int = a
         a = b
         b = t
     if b > c:
-        crumble t = b
+        crumble t: int = b
         b = c
         c = t
     if c > d:
-        crumble t = c
+        crumble t: int = c
         c = d
         d = t
-
-    // Pass 3
     if a > b:
-        crumble t = a
+        crumble t: int = a
         a = b
         b = t
     if b > c:
-        crumble t = b
+        crumble t: int = b
         b = c
         c = t
-
-    // Pass 4
     if a > b:
-        crumble t = a
+        crumble t: int = a
         a = b
         b = t
 

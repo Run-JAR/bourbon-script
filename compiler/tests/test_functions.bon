@@ -1,26 +1,27 @@
 // test_functions.bon
 
-recipe add(a, b):
+recipe add(a: int, b: int) -> int:
     plate a + b
 
-recipe max(a, b):
+recipe max(a: int, b: int) -> int:
     if a > b:
         plate a
     otherwise:
         plate b
 
-recipe factorial(n):
+recipe factorial(n: int) -> int:
     if n <= 1:
         plate 1
-    plate n * factorial(n - 1)
+    otherwise:
+        plate n * factorial(n - 1)
 
-recipe is_even(n):
+recipe is_even(n: int) -> int:
     if n % 2 == 0:
         plate 1
     otherwise:
         plate 0
 
-recipe main():
+recipe main() -> void:
     display(add(3, 4))
     display(max(10, 7))
     display(factorial(6))

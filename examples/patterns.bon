@@ -1,14 +1,14 @@
-// patterns.bon – Number patterns and sequences
+// patterns.bon
 
-recipe triangle(n):
+recipe triangle(n: int) -> int:
     plate n * (n + 1) / 2
 
-recipe square(n):
+recipe square(n: int) -> int:
     plate n * n
 
-recipe is_perfect(n):
-    crumble sum = 1
-    crumble i = 2
+recipe is_perfect(n: int) -> int:
+    crumble sum: int = 1
+    crumble i: int = 2
     while i * i <= n:
         if n % i == 0:
             sum = sum + i
@@ -17,23 +17,18 @@ recipe is_perfect(n):
         i = i + 1
     if n > 1 && sum == n:
         plate 1
-    plate 0
+    otherwise:
+        plate 0
 
-recipe main():
+recipe main() -> void:
     display("Triangle numbers:")
-    crumble i = 1
-    while i <= 10:
+    bake i from 1 to 11:
         display(triangle(i))
-        i = i + 1
-
     display("Square numbers:")
-    i = 1
-    while i <= 10:
+    bake i from 1 to 11:
         display(square(i))
-        i = i + 1
-
     display("Perfect numbers up to 1000:")
-    i = 2
+    crumble i: int = 2
     while i <= 1000:
         if is_perfect(i):
             display(i)

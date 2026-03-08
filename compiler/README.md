@@ -2,7 +2,7 @@
 
 > *"Snap it, dunk it, run it."*
 
-A programming language inspired by the bourbon biscuit. Clean indentation-based syntax with its own biscuit-flavoured keywords.
+A statically-typed, indentation-based programming language inspired by the bourbon biscuit.
 
 ---
 
@@ -11,21 +11,15 @@ A programming language inspired by the bourbon biscuit. Clean indentation-based 
 **Requirements:** Python 3.8+
 
 ```bash
-# Clone the repo
 git clone https://github.com/yourusername/bourbonscript
 cd bourbonscript/compiler
-
-# Run a .bon file
 python3 bourbon.py program.bon
 ```
 
-**Or use the standalone binary (no Python needed):**
+**Standalone binary:**
 ```bash
-# Linux/WSL
-./bourbon program.bon
-
-# Windows
-bourbon.exe program.bon
+./bourbon program.bon        # Linux
+bourbon.exe program.bon      # Windows
 ```
 
 ---
@@ -45,25 +39,40 @@ bourbon.exe program.bon
 
 ## Syntax
 
-BourbonScript uses **indentation** to define blocks and biscuit-themed keywords.
-
 ### Hello World
 ```bon
-recipe main():
+recipe main() -> void:
     display("Hello, World!")
 ```
 
-### Variables
+### Variables (with types)
 ```bon
-crumble x = 5
-crumble name = "Bourbon Biscuit"
-crumble flag = true
+crumble x: int = 5
+crumble name: str = "Bourbon Biscuit"
+crumble flag: bool = fresh
 ```
 
-### Arithmetic
+### Types
+| Type | Meaning |
+|------|---------|
+| `int` | Integer number |
+| `str` | String of text |
+| `bool` | Boolean (`fresh` or `stale`) |
+| `void` | No return value |
+
+### Booleans
 ```bon
-crumble result = (x + 10) * 2
-crumble remainder = 17 % 5
+crumble hungry: bool = fresh    // true
+crumble full: bool = stale      // false
+```
+
+### Functions (with typed params and return type)
+```bon
+recipe add(a: int, b: int) -> int:
+    plate a + b
+
+recipe greet(name: str) -> void:
+    display("Hello, " + name)
 ```
 
 ### If / Otherwise
@@ -76,32 +85,32 @@ otherwise:
     display("negative")
 ```
 
-### While Loop
+### Range Loop (bake)
 ```bon
-crumble i = 0
-while i < 10:
+// bake i from <start> to <end>  (end is exclusive)
+bake i from 0 to 10:
     display(i)
-    i = i + 1
 ```
 
-### Functions
+### Condition Loop (while)
 ```bon
-recipe add(a, b):
-    plate a + b
+while x != 0:
+    x = x / 2
+```
 
-recipe main():
-    display(add(3, 4))
+### User Input
+```bon
+crumble name: str = order("What is your name? ")
+display("Hello, " + name)
 ```
 
 ### Recursion
 ```bon
-recipe factorial(n):
+recipe factorial(n: int) -> int:
     if n <= 1:
         plate 1
-    plate n * factorial(n - 1)
-
-recipe main():
-    display(factorial(6))
+    otherwise:
+        plate n * factorial(n - 1)
 ```
 
 ---
@@ -114,10 +123,13 @@ recipe main():
 | `recipe` | Define a function |
 | `plate` | Return a value |
 | `display()` | Print to output |
+| `order()` | Read user input |
 | `if` | Conditional |
 | `otherwise` | Else / else if |
-| `while` | Loop |
-| `true` / `false` | Boolean literals |
+| `bake` | Range loop |
+| `while` | Condition loop |
+| `fresh` | Boolean true |
+| `stale` | Boolean false |
 
 ## Operators
 
@@ -131,11 +143,9 @@ recipe main():
 
 ## Examples
 
-The `examples/` folder contains:
-
 | File | Description |
 |------|-------------|
-| `fizzbuzz.bon` | Classic FizzBuzz up to 20 |
+| `fizzbuzz.bon` | Classic FizzBuzz |
 | `countdown.bon` | Countdown to biscuit time |
 | `calculator.bon` | add, subtract, multiply, divide, clamp |
 | `power.bon` | Powers of 2 + prime sieve |
@@ -153,22 +163,15 @@ The `examples/` folder contains:
 bourbonscript/
 ├── compiler/
 │   ├── bourbon.py       # CLI entry point
-│   ├── lexer.py         # Tokenizer (with INDENT/DEDENT)
+│   ├── lexer.py         # Tokenizer (INDENT/DEDENT)
 │   ├── parser.py        # Recursive descent parser
 │   ├── bon_ast.py       # AST node definitions
-│   ├── semantic.py      # Scope & type validation
+│   ├── semantic.py      # Type & scope validation
 │   ├── interpreter.py   # Tree-walking interpreter
 │   ├── codegen.py       # LLVM IR code generator
 │   ├── run_tests.py     # Automated test runner
 │   └── tests/
-│       ├── test_hello.bon
-│       ├── test_arithmetic.bon
-│       ├── test_loop.bon
-│       ├── test_functions.bon
-│       ├── test_fibonacci.bon
-│       └── test_strings.bon
 └── examples/
-    └── *.bon
 ```
 
 ---
@@ -177,25 +180,22 @@ bourbonscript/
 
 **Windows:**
 ```powershell
-pip install pyinstaller
 cd compiler
 pyinstaller --onefile bourbon.py
-# output: compiler/dist/bourbon.exe
+# dist\bourbon.exe
 ```
 
 **Linux / WSL:**
 ```bash
-# Important: build from the Linux filesystem, not /mnt/c/...
 cp -r compiler ~/bourbon-compiler
 cd ~/bourbon-compiler
-pip install pyinstaller --break-system-packages
 pyinstaller --onefile bourbon.py
-# output: ~/bourbon-compiler/dist/bourbon
+# dist/bourbon
 ```
 
 ---
 
 ## Roadmap
 
-**v2:** Arrays · Strings · Modules · Imports  
-**v3:** Structs · Pointers · Generics · Package manager
+**v2:** Arrays · String operations · Modules · Imports  
+**v3:** Structs · Generics · Package manager

@@ -1,12 +1,11 @@
 // test_fibonacci.bon
 
-recipe fib(n):
+recipe fib(n: int) -> int:
     if n <= 1:
         plate n
-    plate fib(n - 1) + fib(n - 2)
+    otherwise:
+        plate fib(n - 1) + fib(n - 2)
 
-recipe main():
-    crumble i = 0
-    while i < 10:
+recipe main() -> void:
+    bake i from 0 to 10:
         display(fib(i))
-        i = i + 1

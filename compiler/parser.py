@@ -1,19 +1,21 @@
 # parser.py – Recursive Descent Parser for BourbonScript
-# Handles indentation-based blocks via INDENT/DEDENT tokens
 
 from lexer import (
     Token, TT_NUMBER, TT_STRING, TT_IDENTIFIER, TT_KEYWORD,
     TT_PLUS, TT_MINUS, TT_MUL, TT_DIV, TT_MOD,
     TT_EQ, TT_NEQ, TT_LT, TT_LTE, TT_GT, TT_GTE,
-    TT_AND, TT_OR, TT_NOT, TT_ASSIGN,
+    TT_AND, TT_OR, TT_NOT, TT_ASSIGN, TT_ARROW,
     TT_LPAREN, TT_RPAREN, TT_COMMA, TT_COLON,
     TT_NEWLINE, TT_INDENT, TT_DEDENT, TT_EOF
 )
 from bon_ast import (
     ProgramNode, NumberNode, StringNode, BoolNode,
     VarAccessNode, VarAssignNode, BinaryOpNode, UnaryOpNode,
-    FunctionNode, CallNode, ReturnNode, IfNode, WhileNode, PrintNode, OrderNode
+    FunctionNode, CallNode, ReturnNode, IfNode, WhileNode,
+    BakeNode, PrintNode, OrderNode
 )
+
+TYPE_KEYWORDS = {'int', 'str', 'bool', 'void'}
 
 class ParseError(Exception):
     def __init__(self, message, line):
@@ -39,7 +41,7 @@ class Parser:
         return tok
 
     def skip_newlines(self):
-        while self.current().type in (TT_NEWLINE,):
+        while self.current().type == TT_NEWLINE:
             self.advance()
 
     def expect(self, type_, value=None):
@@ -61,7 +63,10 @@ class Parser:
             return False
         return True
 
-    # ── Program ──────────────────────────────────────────────────────────────
+    def match_type_keyword(self):
+        return self.current().type == TT_KEYWORD and self.current().value in TYPE_KEYWORDS
+
+    # ── Program ───────────────────────────────────────────────────────────────
 
     def parse(self):
         self.skip_newlines()
@@ -71,47 +76,53 @@ class Parser:
             self.skip_newlines()
         return ProgramNode(stmts)
 
-    # ── Statements ───────────────────────────────────────────────────────────
+    # ── Statements ────────────────────────────────────────────────────────────
 
     def parse_statement(self):
         self.skip_newlines()
         tok = self.current()
 
         if tok.type == TT_KEYWORD:
-            if tok.value == 'crumble':
-                return self.parse_crumble()
-            if tok.value == 'recipe':
-                return self.parse_recipe()
-            if tok.value == 'if':
-                return self.parse_if()
-            if tok.value == 'while':
-                return self.parse_while()
-            if tok.value == 'plate':
-                return self.parse_plate()
-            if tok.value == 'display':
-                return self.parse_display()
-            if tok.value == 'order':
-                return self.parse_order()
+            if tok.value == 'crumble':   return self.parse_crumble()
+            if tok.value == 'recipe':    return self.parse_recipe()
+            if tok.value == 'if':        return self.parse_if()
+            if tok.value == 'while':     return self.parse_while()
+            if tok.value == 'bake':      return self.parse_bake()
+            if tok.value == 'plate':     return self.parse_plate()
+            if tok.value == 'display':   return self.parse_display()
+            if tok.value == 'order':     return self.parse_order()
 
-        # Reassignment: identifier = expr
         if tok.type == TT_IDENTIFIER and self.peek().type == TT_ASSIGN:
             return self.parse_assign()
 
-        # Expression statement (e.g. function call)
         return self.parse_expression()
+
+    def parse_type(self):
+        """Parse a type annotation keyword and return it as a string."""
+        if not self.match_type_keyword():
+            raise ParseError(
+                f"Expected a type (int, str, bool, void), got {self.current().value!r}",
+                self.current().line
+            )
+        return self.advance().value
 
     def parse_crumble(self):
         self.expect_keyword('crumble')
         name_tok = self.expect(TT_IDENTIFIER)
+        # Optional type annotation: crumble x: int = 5
+        type_ann = None
+        if self.match(TT_COLON):
+            self.advance()
+            type_ann = self.parse_type()
         self.expect(TT_ASSIGN)
         value = self.parse_expression()
-        return VarAssignNode(name_tok.value, value, is_let=True)
+        return VarAssignNode(name_tok.value, type_ann, value, is_let=True)
 
     def parse_assign(self):
         name_tok = self.advance()
         self.expect(TT_ASSIGN)
         value = self.parse_expression()
-        return VarAssignNode(name_tok.value, value, is_let=False)
+        return VarAssignNode(name_tok.value, None, value, is_let=False)
 
     def parse_recipe(self):
         self.expect_keyword('recipe')
@@ -119,14 +130,29 @@ class Parser:
         self.expect(TT_LPAREN)
         params = []
         if not self.match(TT_RPAREN):
-            params.append(self.expect(TT_IDENTIFIER).value)
+            pname = self.expect(TT_IDENTIFIER).value
+            ptype = None
+            if self.match(TT_COLON):
+                self.advance()
+                ptype = self.parse_type()
+            params.append((pname, ptype))
             while self.match(TT_COMMA):
                 self.advance()
-                params.append(self.expect(TT_IDENTIFIER).value)
+                pname = self.expect(TT_IDENTIFIER).value
+                ptype = None
+                if self.match(TT_COLON):
+                    self.advance()
+                    ptype = self.parse_type()
+                params.append((pname, ptype))
         self.expect(TT_RPAREN)
+        # Optional return type: -> int
+        return_type = None
+        if self.match(TT_ARROW):
+            self.advance()
+            return_type = self.parse_type()
         self.expect(TT_COLON)
         body = self.parse_block()
-        return FunctionNode(name_tok.value, params, body)
+        return FunctionNode(name_tok.value, params, return_type, body)
 
     def parse_if(self):
         self.expect_keyword('if')
@@ -138,7 +164,6 @@ class Parser:
         if self.match(TT_KEYWORD, 'otherwise'):
             self.advance()
             if self.match(TT_KEYWORD, 'if'):
-                # "otherwise if ..." — no colon here, just chain straight into parse_if
                 else_body = [self.parse_if()]
             else:
                 self.expect(TT_COLON)
@@ -151,6 +176,18 @@ class Parser:
         self.expect(TT_COLON)
         body = self.parse_block()
         return WhileNode(condition, body)
+
+    def parse_bake(self):
+        """bake <var> from <start> to <end>:"""
+        self.expect_keyword('bake')
+        var_tok = self.expect(TT_IDENTIFIER)
+        self.expect_keyword('from')
+        start = self.parse_expression()
+        self.expect_keyword('to')
+        end = self.parse_expression()
+        self.expect(TT_COLON)
+        body = self.parse_block()
+        return BakeNode(var_tok.value, start, end, body)
 
     def parse_plate(self):
         self.expect_keyword('plate')
@@ -169,7 +206,6 @@ class Parser:
     def parse_order(self):
         self.expect_keyword('order')
         self.expect(TT_LPAREN)
-        # prompt is optional
         if self.match(TT_RPAREN):
             self.advance()
             return OrderNode(None)
@@ -178,7 +214,6 @@ class Parser:
         return OrderNode(prompt)
 
     def parse_block(self):
-        """Parse an indented block: NEWLINE INDENT stmts DEDENT"""
         self.skip_newlines()
         self.expect(TT_INDENT)
         stmts = []
@@ -187,14 +222,13 @@ class Parser:
             if self.match(TT_DEDENT) or self.match(TT_EOF):
                 break
             stmts.append(self.parse_statement())
-            # consume trailing newline after statement
             if self.match(TT_NEWLINE):
                 self.advance()
         if self.match(TT_DEDENT):
             self.advance()
         return stmts
 
-    # ── Expressions ──────────────────────────────────────────────────────────
+    # ── Expressions ───────────────────────────────────────────────────────────
 
     def parse_expression(self):
         return self.parse_or()
@@ -267,9 +301,9 @@ class Parser:
             self.advance()
             return StringNode(tok.value)
 
-        if tok.type == TT_KEYWORD and tok.value in ('true', 'false'):
+        if tok.type == TT_KEYWORD and tok.value in ('fresh', 'stale'):
             self.advance()
-            return BoolNode(tok.value == 'true')
+            return BoolNode(tok.value == 'fresh')
 
         if tok.type == TT_KEYWORD and tok.value == 'display':
             return self.parse_display()

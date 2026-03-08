@@ -1,53 +1,51 @@
-// calculator.bon – A functional calculator demo
+// calculator.bon
 
-recipe add(a, b):
+recipe add(a: int, b: int) -> int:
     plate a + b
 
-recipe subtract(a, b):
+recipe subtract(a: int, b: int) -> int:
     plate a - b
 
-recipe multiply(a, b):
+recipe multiply(a: int, b: int) -> int:
     plate a * b
 
-recipe divide(a, b):
+recipe divide(a: int, b: int) -> int:
     plate a / b
 
-recipe abs(n):
+recipe abs(n: int) -> int:
     if n < 0:
         plate n * -1
-    plate n
+    otherwise:
+        plate n
 
-recipe min(a, b):
+recipe min(a: int, b: int) -> int:
     if a < b:
         plate a
-    plate b
+    otherwise:
+        plate b
 
-recipe max(a, b):
+recipe max(a: int, b: int) -> int:
     if a > b:
         plate a
-    plate b
+    otherwise:
+        plate b
 
-recipe clamp(val, lo, hi):
+recipe clamp(val: int, lo: int, hi: int) -> int:
     plate max(lo, min(val, hi))
 
-recipe main():
+recipe main() -> void:
     display("Basic operations:")
     display(add(12, 8))
     display(subtract(100, 37))
     display(multiply(6, 7))
     display(divide(144, 12))
-
     display("abs(-42) =")
     display(abs(-42))
-
     display("min(3, 9) =")
     display(min(3, 9))
-
     display("max(3, 9) =")
     display(max(3, 9))
-
     display("clamp(15, 0, 10) =")
     display(clamp(15, 0, 10))
-
     display("clamp(-5, 0, 10) =")
     display(clamp(-5, 0, 10))

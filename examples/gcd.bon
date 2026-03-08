@@ -1,24 +1,21 @@
-// gcd.bon – Greatest common divisor and lowest common multiple
+// gcd.bon
 
-recipe gcd(a, b):
+recipe gcd(a: int, b: int) -> int:
     while b != 0:
-        crumble temp = b
+        crumble temp: int = b
         b = a % b
         a = temp
     plate a
 
-recipe lcm(a, b):
+recipe lcm(a: int, b: int) -> int:
     plate a / gcd(a, b) * b
 
-recipe main():
+recipe main() -> void:
     display("GCD(48, 18) =")
     display(gcd(48, 18))
-
     display("GCD(100, 75) =")
     display(gcd(100, 75))
-
     display("LCM(4, 6) =")
     display(lcm(4, 6))
-
     display("LCM(12, 15) =")
     display(lcm(12, 15))

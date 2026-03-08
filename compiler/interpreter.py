@@ -1,14 +1,13 @@
 # interpreter.py – Tree-walking interpreter for BourbonScript
-# This serves as the execution backend (equivalent to running compiled code).
 
 from bon_ast import (
     ProgramNode, NumberNode, StringNode, BoolNode,
     VarAccessNode, VarAssignNode, BinaryOpNode, UnaryOpNode,
-    FunctionNode, CallNode, ReturnNode, IfNode, WhileNode, PrintNode, OrderNode
+    FunctionNode, CallNode, ReturnNode, IfNode, WhileNode,
+    BakeNode, PrintNode, OrderNode
 )
 
 class ReturnSignal(Exception):
-    """Used to propagate return values up the call stack."""
     def __init__(self, value):
         self.value = value
 
@@ -45,17 +44,12 @@ class Interpreter:
         self.functions = {}
 
     def run(self, program):
-        # First pass: register all functions
         for stmt in program.statements:
             if isinstance(stmt, FunctionNode):
                 self.functions[stmt.name] = stmt
-
-        # Execute all top-level statements
         for stmt in program.statements:
             if not isinstance(stmt, FunctionNode):
                 self.eval(stmt, self.global_env)
-
-        # Auto-call main() if defined
         if 'main' in self.functions:
             self.call_function('main', [], self.global_env)
 
@@ -66,14 +60,10 @@ class Interpreter:
             raise RuntimeError_(f"Unknown node type: {type(node).__name__}")
         return handler(node, env)
 
-    def eval_NumberNode(self, node, env):
-        return node.value
-
-    def eval_StringNode(self, node, env):
-        return node.value
-
-    def eval_BoolNode(self, node, env):
-        return node.value
+    def eval_NumberNode(self, node, env):   return node.value
+    def eval_StringNode(self, node, env):   return node.value
+    def eval_BoolNode(self, node, env):     return node.value
+    def eval_FunctionNode(self, node, env): return None
 
     def eval_VarAccessNode(self, node, env):
         return env.get(node.name)
@@ -90,18 +80,17 @@ class Interpreter:
         left = self.eval(node.left, env)
         right = self.eval(node.right, env)
         op = node.op
-
         if op == '+':
             if isinstance(left, str) or isinstance(right, str):
                 return self._to_str(left) + self._to_str(right)
             return left + right
-        if op == '-': return left - right
-        if op == '*': return left * right
+        if op == '-':  return left - right
+        if op == '*':  return left * right
         if op == '/':
             if right == 0:
                 raise RuntimeError_("Division by zero")
             return left / right if isinstance(left, float) or isinstance(right, float) else left // right
-        if op == '%': return left % right
+        if op == '%':  return left % right
         if op == '==': return left == right
         if op == '!=': return left != right
         if op == '<':  return left < right
@@ -110,7 +99,6 @@ class Interpreter:
         if op == '>=': return left >= right
         if op == '&&': return bool(left) and bool(right)
         if op == '||': return bool(left) or bool(right)
-
         raise RuntimeError_(f"Unknown operator: {op}")
 
     def eval_UnaryOpNode(self, node, env):
@@ -120,8 +108,7 @@ class Interpreter:
         raise RuntimeError_(f"Unknown unary operator: {node.op}")
 
     def eval_PrintNode(self, node, env):
-        value = self.eval(node.value_node, env)
-        print(self._to_str(value))
+        print(self._to_str(self.eval(node.value_node, env)))
         return None
 
     def eval_OrderNode(self, node, env):
@@ -137,12 +124,10 @@ class Interpreter:
             raise RuntimeError_(f"Undefined function: '{name}'")
         func = self.functions[name]
         if len(args) != len(func.params):
-            raise RuntimeError_(
-                f"Function '{name}' expects {len(func.params)} args, got {len(args)}"
-            )
+            raise RuntimeError_(f"Recipe '{name}' expects {len(func.params)} args, got {len(args)}")
         func_env = Environment(parent=self.global_env)
-        for param, val in zip(func.params, args):
-            func_env.set(param, val)
+        for (pname, ptype), val in zip(func.params, args):
+            func_env.set(pname, val)
         try:
             for stmt in func.body:
                 self.eval(stmt, func_env)
@@ -155,9 +140,8 @@ class Interpreter:
         raise ReturnSignal(value)
 
     def eval_IfNode(self, node, env):
-        cond = self.eval(node.condition, env)
         child_env = Environment(parent=env)
-        if self._truthy(cond):
+        if self._truthy(self.eval(node.condition, env)):
             for stmt in node.then_body:
                 self.eval(stmt, child_env)
         elif node.else_body:
@@ -173,20 +157,28 @@ class Interpreter:
                 self.eval(stmt, child_env)
         return None
 
-    def eval_FunctionNode(self, node, env):
-        # Already registered in run(); skip here
-        return None
+    def eval_BakeNode(self, node, env):
+        start = int(self.eval(node.start, env))
+        end   = int(self.eval(node.end, env))
+        for i in range(start, end):
+            child_env = Environment(parent=env)
+            child_env.set(node.var, i)
+            try:
+                for stmt in node.body:
+                    self.eval(stmt, child_env)
+            except ReturnSignal:
+                raise
 
     def _truthy(self, val):
-        if val is None: return False
-        if isinstance(val, bool): return val
+        if val is None:            return False
+        if isinstance(val, bool):  return val
         if isinstance(val, (int, float)): return val != 0
-        if isinstance(val, str): return len(val) > 0
+        if isinstance(val, str):   return len(val) > 0
         return True
 
     def _to_str(self, val):
         if isinstance(val, bool):
-            return 'true' if val else 'false'
+            return 'fresh' if val else 'stale'
         if isinstance(val, float) and val == int(val):
             return str(int(val))
         return str(val)

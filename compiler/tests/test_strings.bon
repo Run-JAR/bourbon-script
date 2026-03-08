@@ -1,17 +1,17 @@
 // test_strings.bon
 
-recipe greet(n):
+recipe greet(n: int) -> int:
     display("Hello from BourbonScript!")
     plate 0
 
-recipe main():
+recipe main() -> void:
     display("Starting BourbonScript tests...")
     display("String concatenation:")
-    crumble msg = "Bourbon" + " Biscuit"
+    crumble msg: str = "Bourbon" + " Biscuit"
     display(msg)
     display("Booleans:")
-    crumble t = true
-    crumble f = false
+    crumble t: bool = fresh
+    crumble f: bool = stale
     display(t)
     display(f)
     display("Logic:")
