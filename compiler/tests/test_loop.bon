@@ -1,6 +1,0 @@
-// test_loop.bon
-
-recipe main() -> void:
-    bake i from 0 to 5:
-        display(i)
-    display(99)
